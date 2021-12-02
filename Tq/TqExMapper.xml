@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mcbt.tq.mapper.TqExMapper">
+
+	<!-- 1. 보기 리스트 -->
+	<select id="list" resultType="com.mcbt.tq.vo.TqExVO">
+		select eno, no, ex from tq_ex where
+		no = #{no}
+	</select>
+
+	<!-- 2. 보기 게시판 보기 -->
+	<select id="exWriteForm" resultType="com.mcbt.tq.vo.TqVO">
+		select
+		no, quiz, eno from tq
+		WHERE no = #{no}
+	</select>
+
+	<!-- 2-1. 보기 생성 -->
+	<insert id="exWrite">
+		INSERT INTO tq_ex(eno,no,ex)
+		VALUES(tq_ex_seq.nextval, #{no},#{ex})
+	</insert>
+
+	<!-- 3. 보기 수정 -->
+	<update id="exUpdate">
+		update tq_ex set ex = #{ex}, id = #{id}
+		where eno =
+		#{eno}
+	</update>
+
+	<!-- 4. 보기 삭제 -->
+	<delete id="exDelete">
+		delete from tq_ex
+		where ex = #{ex}
+	</delete>
+
+</mapper>

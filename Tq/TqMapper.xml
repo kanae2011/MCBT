@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespcae="package + interface" -->
+<mapper namespace="com.mcbt.tq.mapper.TqMapper">
+	<!-- 1. 게시판 리스트 -->
+	<!-- id="method" -->
+	<select id="list" resultType="com.mcbt.tq.vo.TqVO">
+		SELECT * FROM ( SELECT ROWNUM AS rn, A.* FROM (
+		SELECT ROWNUM, no, id, writeDate, accept, quiz, lev, right
+		from tq
+		<if test="lev == 'top'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or lev like '%'||#{lev}||'%'
+		</if>
+		<if test="lev == 'mid'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or lev like '%'||#{lev}||'%'
+		</if>
+		<if test="lev == 'bottom'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or lev like '%'||#{lev}||'%'
+		</if>
+		<if test="accept == '대기'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or accept like '%'||#{accept}||'%'
+		</if>
+		<if test="accept == '승인'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or accept like '%'||#{accept}||'%'
+		</if>
+		<if test="accept == '거절'">
+		where #{pageObject.startRow} = #{pageObject.endRow}
+		or accept like '%'||#{accept}||'%'
+		</if>
+		<!-- mybatis에서는 데이터 자동 변환을 한다. 글자가 한자이면 char -->
+		<include refid="search" />
+		order by no desc
+		)A ) WHERE rn BETWEEN #{pageObject.startRow} AND #{pageObject.endRow}
+	</select>
+
+	<!-- 1-1. 게시판 전체 글의 갯수 -->
+	<select id="getTotalRow" resultType="java.lang.Long">
+		select count(*) from tq
+		<!-- mybatis에서는 데이터 자동 변환을 한다. 글자가 한자이면 char -->
+		<include refid="search" />
+	</select>
+
+	<sql id="search">
+		<!-- mybatis에서는 데이터 자동변환을 한다. 글자가 한자이면 char -->
+		<if test="word != null and word != ''.toString()">
+			<!-- 검색하는 데이터가 있는 경우 where가 나온다. -->
+			WHERE 1 = 0
+			<if test="key == 't'.toString()">
+				OR quiz like '%' || #{word} || '%'
+			</if>
+			<if test="key == 'w'.toString()">
+				OR id like '%' || #{word} || '%'
+			</if>
+			<if test="key == 'tw'">
+				OR quiz like '%' || #{word} || '%'
+				OR id like '%' || #{word} || '%'
+			</if>
+		</if>
+
+	</sql>
+	
+	<!-- 2. 게시판 글보기 -->
+	<select id="view" resultType="com.mcbt.tq.vo.TqVO">
+		select no, quiz, lev, id,
+		writeDate, accept, right
+		from tq
+		where no = #{no}
+	</select>
+
+	<!-- 3. 게시판 글쓰기 -->
+	<insert id="write">
+		insert into tq(no, quiz, lev, id)
+		values(tq_seq.nextval, #{quiz}, #{lev}, #{id})
+	</insert>
+
+	<!-- 3. 게시판 글쓰기 보기 추가 -->
+	<select id="write02" resultType="com.mcbt.tq.vo.TqVO">
+		select no, quiz, lev, id,
+		writeDate, accept, right
+		from tq
+		where no = #{no}
+	</select>
+
+	<!-- 5.정답 등록 -->
+	<update id="right">
+		UPDATE tq SET RIGHT= #{right} WHERE NO =
+		#{no}
+	</update>
+
+	<!-- 4. 게시판 글수정 -->
+	<update id="update">
+		update tq set quiz = #{quiz}, lev = #{lev}, accept =
+		#{accept}, right = #{right}
+		where no = #{no}
+	</update>
+
+	<!-- 5. 게시판 글삭제 -->
+	<delete id="delete">
+		delete from tq
+		where no = #{no}
+	</delete>
+
+	<!-- 가장 큰 번호 불러오기 -->
+	<select id="getMax" resultType="java.lang.Long">
+		select max(no) from tq
+	</select>
+
+</mapper>
