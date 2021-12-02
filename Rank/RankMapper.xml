@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace="package + interface" -->
+<mapper namespace="com.mcbt.rank.mapper.RankMapper">
+	<!-- 1. 게시판 목록 -->
+	<!-- id="method" -->
+	<select id="alist" resultType="com.mcbt.rank.vo.RankVO" parameterType="string">
+		SELECT RNUM, NO, ID, SCORE, TESTDATE, LEV
+		FROM(	
+			SELECT ROWNUM RNUM, NO, ID, SCORE, TESTDATE, LEV
+			FROM(	
+				SELECT NO, ID, SCORE, TESTDATE, LEV
+				FROM RANK WHERE
+<!-- 			<include refid="search" /> -->
+<!-- testDate &gt;= '2021-#{startDay}-01' AND testDate &lt; '2021-#{endDay}-31' and -->
+				LEV = #{lev, jdbcType=VARCHAR}
+				ORDER BY SCORE DESC, testDate asc
+				)
+			)
+			WHERE rnum BETWEEN 1 AND 10
+	</select>
+	
+	<select id="list" resultType="com.mcbt.score.vo.ScoreVO">
+	SELECT id, score, turn, lev
+	FROM score
+	WHERE 	LEV = #{lev, jdbcType=VARCHAR}
+	</select>
+<!-- 		검색 조건 쿼리 따로 저장하기 -->
+<!-- 	<sql id="search"> -->
+<!-- 		<if test="startDay != null and endDay != null"> -->
+<!-- 		testDate &gt;= '2021-#{startDay}-01' AND testDate &lt; '2021-#{endDay}-31' and -->
+<!-- 		</if> -->
+<!--  	</sql> -->
+	
+	
+<!-- 검색조건 부여 -->
+<!-- <sql id="sms_status"> -->
+<!--       <isNotEmpty property="search_year"> -->
+<!--             <isNotEmpty property="search_month"> -->
+<!--                   <![CDATA[AND A.REGDATE BETWEEN to_date( #search_year#||#search_month#||'010000', 'YYYYMMDDHH24MI' ) -->
+<!--                           AND to_date( (SELECT TO_CHAR(LAST_DAY(#search_year#||#search_month#||'01'), 'YYYYMMDD') FROM DUAL), 'YYYYMMDDHH24MI' )+0.99999]]> -->
+<!--             </isNotEmpty> -->
+<!--             <isEmpty property="search_month"> -->
+<!--                   <![CDATA[AND A.REGDATE BETWEEN to_date( #search_year#||'01010000', 'YYYYMMDDHH24MI' ) -->
+<!--                                AND to_date( #search_year#||'12310000', 'YYYYMMDDHH24MI' )+0.99999]]> -->
+<!--             </isEmpty> -->
+<!--       </isNotEmpty> -->
+<!-- </sql> -->
+	
+	
+	
+
+
+<!-- 날짜 검색 시도 -->
+<!-- 	<select id="search" parameterType="map" resultType="hashmap"> -->
+<!-- 		select * from rank -->
+<!-- 		where testDate between [to_date(#{startDay, jdbcType="DATE") and to_date({#endDay, jdbcType="DATE"}, 'YYYY.MM.DD')] -->
+<!-- 		where date = to_date(#{testDate, jdbcType="DATE"), 'YYYY-MM-DD') + 1 -->
+<!-- 	</select> -->
+
+
+	
+<!-- 날짜 검색조건 부여 -->
+<!-- <sql id="search"> -->
+<!--       <isNotEmpty property="month"> -->
+<!-- 		<![CDATA[AND A.testDate BETWEEN to_date( #month#||'010000', 'YYYYMMDDHH24MI' ) -->
+<!--  		AND to_date( #month#||'310000', 'YYYYMMDDHH24MI' )+0.99999]]> -->  
+<!--       </isNotEmpty> -->
+<!-- </sql> -->
+<!-- <select name="search_year" id="search_year"> -->
+<!--       <option value="" <c:if test="${searchVO.search_year == ''}">selected="selected"</c:if> >전체년도</option> -->
+<!--       <c:forEach begin="0" end="15" varStatus="status"> -->
+<!--           <option value="${nowYear - status.current}" <c:if test="${searchVO.search_year == nowYear - status.current}">selected="selected"</c:if> >${nowYear - status.current}년</option> -->
+<!--       </c:forEach> -->
+<!-- </select> -->
+<!-- <select name="search_month"> -->
+<!--       <option value="">전체월</option> -->
+<!--       <c:forEach begin="1" end="12" varStatus="status"> -->
+<!--             <c:if test="${status.current < 10}"> -->
+<!--                   <option value="0${status.current}" <c:if test="${searchVO.search_month == status.current}">selected="selected"</c:if> >${status.current}월</option> -->
+<!--             </c:if> -->
+<!--             <c:if test="${status.current >= 10}"> -->
+<!--             <option value="${status.current}" <c:if test="${searchVO.search_month == status.current}">selected="selected"</c:if> >${status.current}월</option> -->
+<!--             </c:if> -->
+<!--   </c:forEach> -->
+<!-- </select> -->
+</mapper>
+
+
+		<!-- 검색 조건 쿼리 따로 저장하기 -->
+<!-- 	<sql id="search"> -->
+<!-- mybatis에서는 데이터 자동변환을 한다. 글자가 한 자이면 char -->
+<!-- 		<if test="startDay != null and endDay != null and lev != null"> -->
+ 			<!-- 검색하는 데이터가 있는 경우 where가 나온다. --> 
+<!-- 			where 1 = 0 -->
+	<!-- 't','c','w' -> .toString() 추가 / 두 개 이상은 x --> 
+<!-- 			<if test="startDay == 't'.toString()"> -->
+<!-- 			 and endDay == 'c'.toString()  -->
+<!-- 				#{word}만 있으면 제목이나 내용 전체를 검색해야 되므로 앞뒤로 %를 붙여줘야 부분 검색 가능 -->
+<!-- 				OR startDay like '%' || #{word} || '%' -->
+<!-- 		OR endDay like '%' || #{endDay} || '%'  -->
+<!-- 			</if> -->
+<!-- 			<if test="endDay == 'c'.toString()"> -->
+<!-- 				OR endDay like '%' || #{word} || '%' -->
+<!-- 			</if> -->
+<!-- 			<if test="lev == 'l'.toString()"> -->
+<!-- 				OR lev like '%' || #{word} || '%' -->
+<!--		</if> -->
+<!-- 			<if test="key == 'tc'"> --> 
+<!-- 				OR title like '%' || #{word} || '%' --> 
+<!-- 				OR content like '%' || #{word} || '%' --> 
+<!-- 			</if> --> 
+<!-- 			<if test="key == 'w'.toString()"> --> 
+<!-- 				OR writer like '%' || #{word} || '%' --> 
+<!-- 			</if> --> 
+<!-- 			<if test="key == 'all'"> --> 
+<!-- 				OR title like '%' || #{word} || '%' --> 
+<!-- 				OR content like '%' || #{word} || '%' --> 
+<!-- 				OR writer like '%' || #{word} || '%' --> 
+<!-- 		</if>	 -->
+<!-- 	</sql> -->
+
+	
+	
+	<!-- 1-1. 게시판 전체글의 갯수 -->
+<!-- 	<select id="getTotalRow" resultType="java.lang.Long"> -->
+<!-- 		select count(*) from rank -->
+<!-- 	</select> -->
+<!-- 	<select id="date" resultType="com.mcbt.rank.vo.RankVO" parameterType="map"> -->
+<!-- 	<where> -->
+<!-- 		select * from (select id, score, testDate, rank() over(order by score desc) -->
+<!-- 		as count from rank  -->
+<!-- 		select * from rank -->
+<!-- 			where testDate >= 'date' and testDate &lt;= Last_day('date') -->
+<!-- 				where testDate between #{startDay} and #{endDay} count &lt;= 10 -->
+<!-- 	<if test='startday!="" and endday !=""'> -->
+<!-- 		where testDate between #{startDay} and #{endDay} -->
+<!--     </if> -->
+<!-- 	</where> -->
+<!-- 		) where count &lt;= 10 -->
+<!-- 	</select> -->
+
+	
+	
+<!-- 	<select id="imageList" resultType="org.zerock.image.vo.ImageVO"> -->
+<!-- 		select rnum, no, title, id, writeDate, fileName -->
+<!-- 		from( -->
+<!-- 			select rownum rnum, no, title, id, writeDate, fileName -->
+<!-- 			from( -->
+<!-- 				select no, title, id, writeDate, fileName -->
+<!-- 				from image -->
+<!-- 			order by no desc -->
+<!-- 			) -->
+<!-- 		) -->
+<!-- 		where rnum between #{startRow} and #{endRow} -->
+<!-- 	</select> -->
