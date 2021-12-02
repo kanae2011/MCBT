@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.mcbt.solve.mapper.SolveMapper">
+	
+	<!-- 문제 랜덤 cnt -->
+	<select id="getCnt" resultType="java.lang.Long">
+		SELECT count(*)
+		FROM test
+		WHERE lev = #{lev}
+	</select>
+	
+	<!-- 문제 푼 회차 계산하기 -->
+	<select id="getMax" resultType="java.lang.Integer">
+		SELECT nvl(MAX(turn),0)
+		FROM solve
+		WHERE id = #{id}
+	</select>
+	
+	<!-- 랜덤으로 문제 번호 10개 가져오기 -->
+	<select id="random" resultType="java.lang.Integer">
+		SELECT no
+		FROM(
+		    SELECT ROWNUM rnum, no
+		        FROM (
+		                SELECT no
+		                FROM test
+		                WHERE lev = #{lev}
+		            )
+			)
+		WHERE rnum in 
+		<foreach item="item" index="index" collection="random"
+	      open="(" separator="," close=")">
+	        #{item}
+  		</foreach>
+	</select>
+	
+	<!-- 1-1. 문제 가져오기 -->
+	<select id="quiz" resultType="com.mcbt.test.vo.TestVO">
+		SELECT no, quiz
+		FROM(
+            SELECT no, quiz
+            FROM test
+		            
+			)
+		WHERE no = #{no}
+	</select>
+	
+	<!-- 1.2 보기 가져오기  -->
+	<select id="ex" resultType="com.mcbt.test.vo.TestExVO">
+		SELECT rnum, eno, no, ex
+		FROM(
+		    SELECT ROWNUM rnum, eno, no, ex
+	        FROM (
+	                SELECT eno, no, ex
+	                FROM test_ex
+	                WHERE no = #{no}
+	            )
+			)
+	</select>
+	
+	<!-- 다음 문제로 넘어가기 -->
+	<insert id="next"> 
+		INSERT INTO solve(list, id, no, pick, turn, lev)
+		VALUES(solve_seq.nextval, #{id}, #{no}, #{pick}, #{turn}, #{lev})
+	</insert>
+	
+	<!-- 점수 계산하기 -->
+	<select id="score" resultType="java.lang.Long">
+	SELECT COUNT(*)
+    FROM test t, solve s
+    WHERE t.no = s.no AND s.pick = t.right AND s.id = #{id} AND s.turn = #{turn}
+	</select>
+	
+	<!-- 점수 DB에 넣기 -->
+	<insert id="scoreIn">
+	INSERT INTO score(no, id, turn, score, lev)
+	VALUES(score_seq.nextval, #{vo.id}, #{vo.turn}, #{correct}, #{vo.lev})
+	</insert>
+	
+	<!-- 정답 페이지 -->
+	<!-- 1-1. 문제 가져오기 -->
+	<select id="answerQuiz" resultType="com.mcbt.test.vo.TestVO">
+		SELECT no, quiz, right
+		FROM(
+		    SELECT ROWNUM rnum, no, quiz, right
+		        FROM (
+		                SELECT no, quiz, right
+		                FROM test
+		            )
+			)
+		WHERE no = #{no}
+	</select>
+	
+	<!-- 1.2 보기 가져오기  -->
+	<select id="answerEx" resultType="com.mcbt.test.vo.TestExVO">
+		SELECT rnum, eno, no, ex
+		FROM(
+		    SELECT ROWNUM rnum, eno, no, ex
+	        FROM (
+	                SELECT eno, no, ex
+	                FROM test_ex
+	                WHERE no = #{no}
+	            )
+			)
+	</select>
+	
+</mapper>
