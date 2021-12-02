@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace="pakage + interface" -->
+<mapper namespace="com.mcbt.image.mapper.ImageMapper">
+	<!-- 1. 이미지 목록 -->
+	<!-- id="method" -->
+	<select id="list" resultType="com.mcbt.image.vo.ImageVO">
+		select rnum, no, title, id, writeDate, fileName
+		from(	
+			select rownum rnum, no, title, id, writeDate, fileName
+			from(	
+				select no, title, id, writeDate, fileName
+				from image 
+				
+				<!-- mybatis에서는 데이터 자동변환을 한다. 글자가 한 자이면 char -->
+				<!-- include refid="search" /> : 검색 가져오기 -->
+<!-- 				<include refid="search" /> -->
+				
+				order by no desc
+				)
+			)
+			where rnum between #{startRow} and #{endRow}	
+	</select>
+
+	<!-- 1-1. 이미지 전체글의 갯수 -->
+	<select id="getTotalRow" resultType="java.lang.Long">
+		select count(*) from image 
+	<!-- mybatis에서는 데이터 자동변환을 한다. 글자가 한 자이면 char -->
+	<!-- include refid="search" /> : 검색 가져오기 -->
+<!-- 	<include refid="search" /> -->
+	</select>
+	
+	<!-- 2. 이미지 글보기 -->
+	<select id="view" resultType="com.mcbt.image.vo.ImageVO">
+		select no, title, content, id, writeDate, fileName
+		from image where no = #{no}
+	</select>
+
+	<!-- 3. 이미지 등록 -->
+	<!-- id="method" -->
+	<insert id="write">
+		insert into image(no, title, content, id, fileName)
+		values(image_seq.nextval, #{title}, #{content}, #{id}, #{fileName})
+	</insert>
+	
+	<!-- 4-1. 이미지 글수정 -->
+	<update id="updateFile">
+		update image set fileName = #{fileName}
+		where no = #{no}
+	</update>
+
+	<!-- 4-2. 이미지 글수정 -->
+	<update id="update">
+		update image set title = #{title}, content = #{content}
+		where no = #{no}
+	</update>
+	
+	<!-- 5. 이미지 글삭제 -->
+	<delete id="delete">
+		delete from image 
+		where no = #{no}
+	</delete>
+	
+<!-- 	6. 순위 목록 -->
+<!-- 	<select id="rankList" resultType="org.zerock.rank.vo.RankVO"> -->
+<!-- 		select rnum, no, id, score, testDate -->
+<!-- 		from(	 -->
+<!-- 			select rownum rnum, no, id, score, testDate -->
+<!-- 			from(	 -->
+<!-- 				select no, id, score, testDate -->
+<!-- 				from image -->
+				
+<!-- 				order by score desc -->
+<!-- 				) -->
+<!-- 			) -->
+<!-- 	</select> -->
+	
+</mapper>
