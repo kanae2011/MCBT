@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.mcbt.test.mapper.TestExMapper">
+  <select id="list" resultType="com.mcbt.test.vo.TestExVO">
+  
+  	SELECT ENO,NO,EX FROM TEST_EX WHERE NO = #{no}
+  </select>
+  
+  <select id="exWriteForm" resultType="com.mcbt.test.vo.TestVO">
+		SELECT
+		NO,QUIZ,RIGHT FROM TEST WHERE NO = #{no} 
+	</select>
+  
+  <insert id="exWrite" >
+  	INSERT INTO TEST_EX(ENO,NO,EX)
+  	VALUES(test_ex_seq.nextval, #{no}, #{ex})
+  </insert>
+  
+  
+  </mapper>

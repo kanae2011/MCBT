@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespcae="package + interface" -->
+<mapper namespace="com.mcbt.test.mapper.TestMapper">
+
+	<!-- 1.문제 목록 -->
+	<select id="list" resultType="com.mcbt.test.vo.TestVO">
+		SELECT *
+		FROM(SELECT ROWNUM as rn, A.*
+		FROM(SELECT ROWNUM,
+		NO,QUIZ FROM TEST
+		<if test="lev == 'top'">
+			where #{pageObject.startRow} = #{pageObject.endRow}
+			or lev like '%'||#{lev}||'%'
+		</if>
+		<if test="lev == 'mid'">
+			where #{pageObject.startRow} = #{pageObject.endRow}
+			or lev like '%'||#{lev}||'%'
+		</if>
+		<if test="lev == 'bottom'">
+			where #{pageObject.startRow} = #{pageObject.endRow}
+			or lev like '%'||#{lev}||'%'
+		</if>
+		ORDER BY NO DESC
+		)A ) WHERE rn BETWEEN #{pageObject.startRow} AND #{pageObject.endRow}
+	</select>
+	
+	<!-- 2.문제 전체 데이터 갯수 가져오기 -->
+	<select id="getTotalRow" resultType="java.lang.Long">
+		SELECT COUNT(*) FROM TEST
+	</select>
+
+	<!-- 3.문제 보기 -->
+	<select id="view" resultType="com.mcbt.test.vo.TestVO">
+		SELECT
+		NO,QUIZ,RIGHT FROM TEST WHERE NO = #{no} 
+	</select>
+	
+	<!-- 4.문제 등록 -->
+	<insert id="write">
+		INSERT INTO TEST(NO,QUIZ,LEV)
+		VALUES(TEST_SEQ.NEXTVAL,#{quiz},#{lev})
+	</insert>
+	
+	<!-- 가장 큰 번호 불러오기 -->
+	<select id="getMax" resultType="java.lang.Long">
+		SELECT MAX(no) FROM TEST
+	</select>
+	
+	<!-- 5.정답 등록 --> 
+	<update id="right" >
+		UPDATE TEST SET RIGHT= #{right} WHERE NO = #{no}
+	</update>
+	
+	<!-- 6.문제 수정 -->
+	<update id="update">
+		UPDATE TEST SET QUIZ= #{quiz} WHERE NO = #{no}
+	</update>
+	
+</mapper>
