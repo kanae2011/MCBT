@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace="pakage + interface" -->
+<mapper namespace="com.mcbt.board.mapper.ReplyMapper">
+	<!-- 1. 게시판 댓글 리스트 -->
+	<!-- id="method" -->
+	<!-- map-pageObject-startRow : pageObject.startRow -->
+	<!-- map-no : no -->
+	<select id="list" resultType="com.mcbt.board.vo.ReplyVO">
+		select rnum, rno, no, replycontent, replyer, replydate from
+		(select rownum rnum, rno, no, replycontent, replyer, replydate
+		from(select rno, no, replycontent, replyer, replydate
+		from reply where no = #{no} order by rno desc))
+		where rnum between #{pageObject.startRow} and #{pageObject.endRow}
+	</select>
+	
+	<select id="getTotalRow" resultType="int">
+		SELECT COUNT(*) FROM reply
+		WHERE no=#{no}
+	</select>
+	
+	<insert id="write">
+		insert into reply(rno, no, replyer, replyContent)
+		values(reply_seq.nextval, #{no, jdbcType=VARCHAR}, #{replyer, jdbcType=VARCHAR}, #{replyContent, jdbcType=VARCHAR})
+	</insert>
+</mapper>
